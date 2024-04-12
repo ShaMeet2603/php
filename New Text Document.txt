@@ -1,0 +1,195 @@
+<?php
+$target_dir = "D:/New Folder/";
+$target_file = $target_dir . basename($_FILES["file1"]["name"]);
+$uploadOk = 1;
+$imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+// Check if image file is a actual image or fake image
+if(isset($_POST["btnSubmit"])) {
+$check = getimagesize($_FILES["file1"]["tmp_name"]);
+if($check !== false) {
+echo "File is an image - " . $check["mime"] . ".";
+$uploadOk = 1;
+} else {
+echo "File is not an image.";
+$uploadOk = 0;
+}
+}
+// Check if file already exists
+if (file_exists($target_file)) {
+echo "Sorry, file already exists.";
+$uploadOk = 0;
+}
+// Check file size
+if ($_FILES["file1"]["size"] > 500000) {
+echo "Sorry, your file is too large.";
+$uploadOk = 0;
+}
+// Allow certain file formats
+if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType
+!= "jpeg"
+&& $imageFileType != "gif" ) {
+echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+$uploadOk = 0;
+}
+// Check if $uploadOk is set to 0 by an error
+if ($uploadOk == 0) {
+echo "Sorry, your file was not uploaded.";
+// if everything is ok, try to upload file
+} else {
+if (move_uploaded_file($_FILES["file1"]["tmp_name"],
+$target_file)) {
+echo "The file ". htmlspecialchars(
+basename( $_FILES["file1"]["name"])). " has been uploaded.";
+} else {
+echo "Sorry, there was an error uploading your file.";
+}
+}?>
+<html>
+<head>
+</head>
+<body>
+    <form action="" method="POST" enctype="multipart/form-data">
+   Select file to upload: <input type ="file" name="file1"><br>
+    <input type="submit" name="btnSubmit">
+    </form>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+////database-connectivity////
+
+
+<?php
+    $conn ;$query;
+    extract($_REQUEST);
+    $conn = mysqli_connect("localhost", "root", "", "studentdb") or die ("Not Connected");
+    // Auto Increment
+    $query = "SELECT MAX(SID) AS SID FROM TBLSTUDENT";
+    // $query="INSERT INTO TABLe"
+    $result = mysqli_query($conn, $query);
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $rno = ((int) $row['SID']) + 1;
+    }
+
+
+function fetchID()
+    {
+        $conn= mysqli_connect("localhost","root","","studentdb") or die("Not Connected");
+        $query = "SELECT MAX(SID) AS SID FROM TBLSTUDENT";
+        $result = mysqli_query($conn,$query);
+        if(mysqli_num_rows($result)>0)
+        {
+            $row=mysqli_fetch_assoc($result);
+            $rno=((int)$row['SID'])+1;
+        }
+    }
+    // fetchID();
+    // global $name;
+    if(isset($_REQUEST['btnInsert']))
+    {
+        // $name="Preet";
+        // echo $name;
+        $conn = mysqli_connect("localhost", "root", "", "studentdb") or die ("Not Connected");
+        // $query="INSERT INTO TBLSTUDENT VALUES (".$_POST['txtID'].",'".$_POST['txtName']."','".$_POST['txtAddress']."',
+        // ".$_POST['txtPincode'].",".$_POST['txtContact'].")";
+        $query="INSERT INTO TBLSTUDENT VALUES (".$txtID.",'".$txtName."','".$txtAddress."',
+         ".$txtPincode.",".$txtContact.")";
+        mysqli_query($conn,$query) or die("Records Not Inserted");
+        echo "Record Inserted";
+        // fetchID();
+    }
+    else if(isset($_REQUEST['btnUpdate']))
+    {
+        // $conn = mysqli_connect("localhost", "root", "", "studentdb") or die ("Not Connected");
+        // $query="UPDATE TBLSTUDENT set SName='".$_POST['txtName']."',SAddress = '".$_POST['txtAddress']."' 
+        // ,SPincode = ".$_POST['txtPincode'].", SContact=".$_POST['txtContact']." WHERE SID=".$_POST['txtID']."";
+        $query="UPDATE TBLSTUDENT set SName='".$txtName."',SAddress = '".$txtAddress."' 
+         ,SPincode = ".$txtPincode.", SContact=".$txtContact." WHERE SID=".$txtID."";
+        //UPDATE FROM TBLSTUDENT SET NAME=VALUE WHERE SID=$SID;
+        mysqli_query($conn,$query) or die("Records Not Updated");
+        echo "Record Updated";
+        // fetchID();
+    }
+    else if(isset($_REQUEST['btnDelete']))
+    {
+        $query="DELETE FROM TBLSTUDENT WHERE SID=".$txtID."";
+        //UPDATE FROM TBLSTUDENT SET NAME=VALUE WHERE SID=$SID;
+        mysqli_query($conn,$query) or die("Records Not Deleted");
+        echo "Record Deleted";
+        // fetchID();
+    }
+?>
+
+<html>
+    <head></head>
+    <body>
+        <form action="" method="post">
+            <br><br><br><br><br>
+            <table align="center" border="1px">
+                <th align="center">Database Operations</th>
+                <tr>
+                    <td>
+                        Enter Student ID:
+                    </td>
+                    <td>
+                        <input type="number" name="txtID" value="<?php echo $rno;?>" >
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Enter Student Name:
+                    </td>
+                    <td>
+                        <input type="text" name="txtName" >
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Enter Student Address:
+                    </td>
+                    <td>
+                        <textarea rows="4" cols="21" name="txtAddress" ></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Enter Student Pincode:
+                    </td>
+                    <td>
+                        <input type="number" name="txtPincode" >
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Enter Student Contact:
+                    </td>
+                    <td>
+                        <input type="number" name="txtContact" maxlength="10">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">
+                        <input type="submit" name="btnInsert" value="Insert">
+                        <input type="submit" name="btnUpdate" value="Update">
+                        <input type="submit" name="btnDelete" value="Delete">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </body>
+</html>
+
+
+
+

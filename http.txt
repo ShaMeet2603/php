@@ -1,0 +1,176 @@
+     (BACK-END)
+web api  
+1-right side controllers-> delete all files
+2- views-> home folder delete
+3- create database->create table   (id auto increment)  after motnull identity(1,1)
+4-tools->Nuget packageManager-> solutions->browse->cors-> (4)webAPi.cors
+5-right side model->add->new item-> ado.net entity data model (name)
+6-app_start-> webapiconfig.cs-> add code between config (var cors = new EnableCorsAttribute("*", "*", "*");
+config.EnableCors(cors);)
+7-controllers->add-> Add class
+8- extend api controller    (BookServiceController : ApiController)  {internalEntities context = new internalEntities();
+        [HttpGet]
+        [Route("GetBooks")]
+        public List<TBLBook> BookList()
+        {
+            return context.TBLBooks.ToList();
+        }        }
+
+    (FRONT-END)
+
+1- create folder in D drive  
+2- open folder in vscode
+3- create file  jquery.js and index.html
+4- google chrome-> download jquery-> open 1stlink then copy j query code and then paste in vs code 
+5-google chrome-> download boostrap 5 -> ectract zip file and paste in folder 
+6- write code in index.html
+    <!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Home</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="bootstrap-5.0.2-dist/css/bootstrap.min.css">
+       
+    </head>
+    <body>
+        <div class="container mt-5 text-bg-info p-5">
+            <table class="table table-success table-stripped" id="bookTable">
+                <h2>Book Data</h1>
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>isbn</th>
+                        <th>price</th>
+                        <th>quantity</th>
+                        <th>author</th>
+                    </tr>
+                </thead>
+                <tbody>
+ 
+                </tbody>
+            </table>
+            <form class="mt-5">
+                <h1>Insert Data</h1>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="txtBookName" placeholder="Book Name" required>
+                    <label for="txtBookIsbn">Book Name</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="txtBookIsbn" placeholder="Book ISBN" required>
+                    <label for="txtBookIsbn">Book ISBN</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="number" class="form-control" id="txtBookPrice" placeholder="Book Price" required>
+                    <label for="txtBookIsbn">Book Price</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="number" class="form-control" id="txtBookQuantity" placeholder="Book Quantity" required>
+                    <label for="txtBookIsbn">Book Quantity</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="txtBookAuthor" placeholder="Book Author" required>
+                    <label for="txtBookIsbn">Book Author</label>
+               
+               
+                </div>
+                <center><div class="btn btn-outline-primary" id="btnAddBook">Add Book</div>
+                </center>
+            </form>
+        </div>
+       
+        <script src="jquery.js" defer></script>
+        <script src="bootstrap-5.0.2-dist/js/bootstrap.min.js" defer></script>
+        <script>
+            document.addEventListener('DOMContentLoaded',fetchData)
+            document.querySelector("#btnAddBook").addEventListener('click',addBook);
+            function fetchData(){
+    $.ajax({
+        url: 'https://localhost:44344/GetBooks',
+        type: 'GET',
+        success: function(response){
+            console.log(response);
+            const tbody = document.querySelector('#bookTable tbody');
+            tbody.innerHTML = "";
+ 
+            if (response.length === 0) {
+                const messageRow = document.createElement('tr');
+                const messageCell = document.createElement('td');
+                messageCell.colSpan = 6; // Spanning all columns
+                messageCell.textContent = 'No data available';
+                messageRow.appendChild(messageCell);
+                tbody.appendChild(messageRow);
+            } else {
+                for (var i = 0; i < response.length; i++){
+                    var tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${response[i]['id']}</td>
+                    <td>${response[i]['name']}</td>
+                    <td>${response[i]['isbn']}</td>
+                    <td>${response[i]['price']}</td>
+                    <td>${response[i]['quantity']}</td>
+                    <td>${response[i]['author']}</td>`
+                    tbody.appendChild(tr);
+                }
+            }
+        },
+        error: function(xhr, status, error){
+            console.error('Error:', status, error);
+        }
+    });
+}
+            function addBook(){
+             
+                const book = {'name':document.querySelector("#txtBookName").value.toLowerCase(),
+                'isbn':document.querySelector("#txtBookIsbn").value,
+                'price':document.querySelector("#txtBookPrice").value,
+                'quantity':document.querySelector("#txtBookQuantity").value,
+                'author':document.querySelector("#txtBookAuthor").value}
+
+                
+                
+                const stringified = JSON.stringify(book);
+
+
+                
+                $.ajax({
+                    url:'https://localhost:44344/api/BookService',
+                    type:'POST',
+                    data:stringified,
+                    contentType:'application/json',
+                    success: function(response){
+                        if(response['output']){
+                            alert('Book added successfully');
+                            fetchData()
+                            clearInputFields()
+                        }
+                        else{
+                            alert(response["message"]);
+                        }
+                    },
+                    error: function(xhr, status, error){
+                        console.error('Error:',status,error);
+                    }
+                });
+            }
+
+
+            function clearInputFields() {
+            document.querySelector("#txtBookName").value = "";
+            document.querySelector("#txtBookIsbn").value = "";
+            document.querySelector("#txtBookPrice").value = "";
+            document.querySelector("#txtBookQuantity").value = "";
+            document.querySelector("#txtBookAuthor").value = "";
+        }
+           
+        </script>
+    </body>
+</html>
+
+
+7- open vs run and copy url from browser and paste in vs code
+
+
+
